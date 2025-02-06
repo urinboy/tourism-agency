@@ -1,22 +1,44 @@
-const db = require('../database');
+const Booking = require("../models/Booking");
 
-exports.getAllBookings = (req, res) => {
-  db.all('SELECT * FROM bookings', [], (err, rows) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
-    res.json({ bookings: rows });
-  });
+exports.createBooking = async (req, res) => {
+  try {
+    const booking = await Booking.create({ userId: req.user.userId, ...req.body });
+    res.status(201).json({ message: "Bron muvaffaqiyatli yaratildi!", booking });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
 
-exports.getBookingById = (req, res) => {
-  const { id } = req.params;
-  db.get('SELECT * FROM bookings WHERE id = ?', [id], (err, row) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
-    res.json({ booking: row });
-  });
+exports.getUserBookings = async (req, res) => {
+  try {
+    const bookings = await Booking.findAll({ where: { userId: req.user.userId } });
+    res.json(bookings);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
 
-// Add more booking-related controller functions as needed
+exports.getAllBookings = async (req, res) => {
+  try {
+    if (req.user.role !== "admin") return res.status(403).json({ message: "Ruxsat etilmagan!" });
+
+    const bookings = await Booking.findAll();
+    res.json(bookings);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.cancelBooking = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const booking = await Booking.findByPk(id);
+
+    if (!booking) return res.status(404).json({ message: "Bron topilmadi!" });
+
+    await booking.destroy();
+    res.json({ message: "Bron bekor qilindi!" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};

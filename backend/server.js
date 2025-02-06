@@ -1,21 +1,14 @@
-const express = require('express');
-const app = express();
-const port = 3000;
+const http = require("http");
+const app = require("./app");
+const { sequelize } = require("./models");
 
-const userRoutes = require('./routes/userRoutes');
-const tourRoutes = require('./routes/tourRoutes');
-const bookingRoutes = require('./routes/bookingRoutes');
-const paymentRoutes = require('./routes/paymentRoutes');
-const reviewRoutes = require('./routes/reviewRoutes');
+const PORT = process.env.PORT || 5000;
 
-app.use(express.json());
+const server = http.createServer(app);
 
-app.use('/api/users', userRoutes);
-app.use('/api/tours', tourRoutes);
-app.use('/api/bookings', bookingRoutes);
-app.use('/api/payments', paymentRoutes);
-app.use('/api/reviews', reviewRoutes);
-
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+sequelize.sync({ force: false }).then(() => {
+  console.log("Ma’lumotlar bazasi ulandi.");
+  server.listen(PORT, () => {
+    console.log(`Server http://localhost:${PORT} da ishga tushdi.`);
+  });
 });

@@ -1,22 +1,50 @@
-const db = require('../database');
+// src/controllers/paymentController.js
+const { Payment } = require("../models");
 
-exports.getAllPayments = (req, res) => {
-  db.all('SELECT * FROM payments', [], (err, rows) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
-    res.json({ payments: rows });
-  });
+// To'lovlar ro'yxatini olish
+exports.getPayments = async (req, res) => {
+  try {
+    const payments = await Payment.findAll();
+    res.json(payments);
+  } catch (error) {
+    res.status(500).json({ message: "Xatolik yuz berdi", error: error.message });
+  }
 };
 
-exports.getPaymentById = (req, res) => {
-  const { id } = req.params;
-  db.get('SELECT * FROM payments WHERE id = ?', [id], (err, row) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
-    res.json({ payment: row });
-  });
+// Yangi to'lov yaratish
+exports.createPayment = async (req, res) => {
+  try {
+    const payment = await Payment.create(req.body);
+    res.status(201).json(payment);
+  } catch (error) {
+    res.status(500).json({ message: "Xatolik yuz berdi", error: error.message });
+  }
 };
 
-// Add more payment-related controller functions as needed
+// To'lovni yangilash
+exports.updatePayment = async (req, res) => {
+  try {
+    const payment = await Payment.findByPk(req.params.id);
+    if (!payment) {
+      return res.status(404).json({ message: "To'lov topilmadi" });
+    }
+    await payment.update(req.body);
+    res.json(payment);
+  } catch (error) {
+    res.status(500).json({ message: "Xatolik yuz berdi", error: error.message });
+  }
+};
+
+// To'lovni o'chirish
+exports.deletePayment = async (req, res) => {
+  try {
+    const payment = await Payment.findByPk(req.params.id);
+    if (!payment) {
+      return res.status(404).json({ message: "To'lov topilmadi" });
+    }
+    await payment.destroy();
+    res.json({ message: "To'lov o'chirildi" });
+  } catch (error) {
+    res.status(500).json({ message: "Xatolik yuz berdi", error: error.message });
+  }
+};
