@@ -1,5 +1,7 @@
 const express = require("express");
+const dotenv = require('dotenv');
 const cors = require("cors");
+const morgan = require("morgan");
 const bodyParser = require("body-parser");
 const authRoutes = require("./routes/authRoutes");
 const tourRoutes = require("./routes/tourRoutes");
@@ -10,7 +12,9 @@ const errorHandler = require("./middlewares/errorHandler");
 
 const app = express();
 
+dotenv.config();
 app.use(cors());
+app.use(morgan("dev"));
 app.use(bodyParser.json());
 
 app.use("/api/auth", authRoutes);

@@ -40,15 +40,59 @@ exports.getProfile = async (req, res) => {
     }
 };
 
-// Foydalanuvchi malumotlarini olish
 exports.getMe = async (req, res) => {
     try {
-        const user = await User.findByPk(req.user.id);  // req.user.token bilan keltirilgan foydalanuvchi ID
+        const user = await User.findByPk(req.user.id); // Middleware orqali kelgan foydalanuvchini olish
         if (!user) {
-            return res.status(404).json({ message: "Foydalanuvchi topilmadi" });
+            return res.status(404).json({ message: 'User not found' });
         }
         res.json(user);
     } catch (error) {
-        res.status(500).json({ message: "Xatolik yuz berdi", error: error.message });
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
     }
 };
+
+// exports.getMe = async (req, res) => {
+//     try {
+//         // Tokenni decode qilish
+//         const decoded = jwt.verify(req.token, process.env.JWT_SECRET);  // req.token - bu middleware tomonidan olingan token
+//         const user = await User.findByPk(decoded.id);  // Tokenni dekodlash orqali foydalanuvchini topish
+
+//         if (!user) {
+//             return res.status(404).json({ message: 'User not found' });
+//         }
+//         res.json(user);  // Foydalanuvchi ma'lumotlarini qaytarish
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ message: 'Server error' });
+//     }
+// };
+
+// Foydalanuvchi malumotlarini olish
+// exports.getMe = async (req, res) => {
+//     try {
+//         const user = await User.findByPk(req.user.id);  // req.user.token bilan keltirilgan foydalanuvchi ID
+//         if (!user) {
+//             return res.status(404).json({ message: "Foydalanuvchi topilmadi" });
+//         }
+//         res.json(user);
+//     } catch (error) {
+//         res.status(500).json({ message: "Xatolik yuz berdi", error: error.message });
+//     }
+// };
+
+// exports.getMe = async (req, res) => {
+//     try {
+//       // Foydalanuvchi tokenini decode qilish
+//       const decoded = jwt.verify(req.token, process.env.JWT_SECRET);
+//       const user = await User.findByPk(decoded.id);
+//       if (!user) {
+//         return res.status(404).json({ message: 'User not found' });
+//       }
+//       res.json(user);
+//     } catch (error) {
+//       console.error(error);
+//       res.status(500).json({ message: 'Server error' });
+//     }
+//   };
